@@ -32,5 +32,6 @@ build/
 ### VS Code ###
 .vscode/
 
-ignore local file
+#ignore local file
 *.local.*
+application.yaml
