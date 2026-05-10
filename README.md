@@ -1,7 +1,7 @@
 # worker-observer-sysem-be
 context :
 
-    - a 30-worker industrial laundry processing 2 tonnes of hotel linen per day across 6 stations : receiving, sorting, washing, drying, ironing/folding, packing/dispatch 
+    - a company with a 30-worker industrial laundry processing 2 tonnes of hotel linen per day across 6 stations : receiving, sorting, washing, drying, ironing/folding, packing/dispatch 
     - Workers track item counts and batch numbers on paper. 
     - a floor manager walks the floor every 90 minutes and reconstructs the day at end-of-shift. The owner sees a weekly Excel report
     - Workers speak the local language with mixed literacy. Phones are personal but Wi-Fi is patchy
