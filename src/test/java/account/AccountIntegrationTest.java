@@ -2,7 +2,7 @@ package account;
 
 import com.example.worker_observer_system.common.IntegrationTest;
 import com.example.worker_observer_system.common.dto.ResponseDto;
-import com.example.worker_observer_system.common.exception.ConflictException;
+import com.example.worker_observer_system.common.exception.ConflictDataException;
 import com.example.worker_observer_system.common.exception.NotFoundException;
 import com.example.worker_observer_system.domain.account.Account;
 import com.example.worker_observer_system.domain.account.AccountController;
@@ -57,7 +57,7 @@ public class AccountIntegrationTest extends IntegrationTest {
         accountController.create(dto);
 
         CreateAccountDto duplicateDto = accountTestCases.getDuplicateEmailCreateAccountDto();
-        assertThrows(ConflictException.class, () -> accountController.create(duplicateDto),
+        assertThrows(ConflictDataException.class, () -> accountController.create(duplicateDto),
                 "Should throw ConflictException for duplicate email");
     }
 
