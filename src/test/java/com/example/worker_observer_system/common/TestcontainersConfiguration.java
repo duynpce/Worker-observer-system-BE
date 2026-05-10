@@ -12,7 +12,7 @@ class TestcontainersConfiguration {
 	@Bean
 	@ServiceConnection
 	static PostgreSQLContainer<?> postgresContainer() {
-		return new PostgreSQLContainer<>(DockerImageName.parse("postgres:18.1")).withInitScript("init.sql");
+		return new PostgreSQLContainer<>(DockerImageName.parse("postgres:18.1"));
 	}
 
 //	@Bean
