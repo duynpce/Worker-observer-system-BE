@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Worker-observer-system-BE.iml" filepath="$PROJECT_DIR$/.idea/Worker-observer-system-BE.iml" />
+      <module fileurl="file://$PROJECT_DIR$/worker-observer-system/worker-observer-system.iml" filepath="$PROJECT_DIR$/worker-observer-system/worker-observer-system.iml" />
     </modules>
   </component>
 </project>
