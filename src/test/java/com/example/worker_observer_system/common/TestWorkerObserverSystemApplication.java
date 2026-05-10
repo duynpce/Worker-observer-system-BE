@@ -1,5 +1,6 @@
-package com.example.worker_observer_system;
+package com.example.worker_observer_system.common;
 
+import com.example.worker_observer_system.WorkerObserverSystemApplication;
 import org.springframework.boot.SpringApplication;
 
 public class TestWorkerObserverSystemApplication {
