@@ -3,6 +3,7 @@ package account;
 import com.example.worker_observer_system.common.UnitTest;
 import com.example.worker_observer_system.common.exception.ConflictDataException;
 import com.example.worker_observer_system.common.exception.NotFoundException;
+import com.example.worker_observer_system.common.util.JwtUtil;
 import com.example.worker_observer_system.domain.account.Account;
 import com.example.worker_observer_system.domain.account.AccountMapper;
 import com.example.worker_observer_system.domain.account.AccountValidator;
@@ -32,6 +33,8 @@ public class AccountUnitTest extends UnitTest {
     private AccountValidator accountValidator;
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private JwtUtil jwtUtil;
 
     @InjectMocks
     private AccountDomainService accountDomainService;
@@ -84,8 +87,9 @@ public class AccountUnitTest extends UnitTest {
         when(accountQueryService.findById(id)).thenReturn(existingAccount);
         when(passwordEncoder.encode(dto.password())).thenReturn("newHashedPassword");
         when(accountQueryService.save(existingAccount)).thenReturn(existingAccount);
+        when(jwtUtil.getUuid()).thenReturn(id.toString());
 
-        Account result = accountDomainService.update(id, dto);
+        Account result = accountDomainService.update(dto);
 
         assertNotNull(result);
         verify(accountValidator).validateUpdate(dto, existingAccount);
@@ -99,8 +103,9 @@ public class AccountUnitTest extends UnitTest {
 
         when(accountQueryService.findById(randomId))
                 .thenThrow(new NotFoundException("Account not found with id: " + randomId));
+        when(jwtUtil.getUuid()).thenReturn(randomId.toString());
 
-        assertThrows(NotFoundException.class, () -> accountDomainService.update(randomId, dto));
+        assertThrows(NotFoundException.class, () -> accountDomainService.update(dto));
         verify(accountValidator, never()).validateUpdate(any(), any());
         verify(accountQueryService, never()).save(any());
     }

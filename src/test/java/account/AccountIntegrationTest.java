@@ -4,6 +4,7 @@ import com.example.worker_observer_system.common.IntegrationTest;
 import com.example.worker_observer_system.common.dto.ResponseDto;
 import com.example.worker_observer_system.common.exception.ConflictDataException;
 import com.example.worker_observer_system.common.exception.NotFoundException;
+import com.example.worker_observer_system.common.util.JwtUtil;
 import com.example.worker_observer_system.domain.account.Account;
 import com.example.worker_observer_system.domain.account.AccountController;
 import com.example.worker_observer_system.domain.account.Service.AccountQueryService;
@@ -14,10 +15,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 public class AccountIntegrationTest extends IntegrationTest {
 
@@ -26,6 +29,9 @@ public class AccountIntegrationTest extends IntegrationTest {
 
     @Autowired
     private AccountQueryService accountQueryService;
+
+    @MockitoBean
+    private JwtUtil jwtUtil;
 
     private AccountTestCases accountTestCases;
 
@@ -69,9 +75,10 @@ public class AccountIntegrationTest extends IntegrationTest {
         Account createdAccount = accountQueryService.findByEmail(createDto.email());
         String initialPassword =  createdAccount.getPassword();
         UUID id = createdAccount.getId();
+        when(jwtUtil.getUuid()).thenReturn(id.toString());
 
         UpdateAccountDto updateDto = accountTestCases.getUpdateAccountDto();
-        ResponseEntity<ResponseDto<String>> response = accountController.update(id, updateDto);
+        ResponseEntity<ResponseDto<String>> response = accountController.update(updateDto);
 
         assertEquals(HttpStatus.OK, response.getStatusCode(), "Response status should be OK");
         assertNotNull(response.getBody(), "Response body should not be null");
@@ -92,7 +99,8 @@ public class AccountIntegrationTest extends IntegrationTest {
         UUID randomId = UUID.randomUUID();
         UpdateAccountDto updateDto = accountTestCases.getUpdateAccountDto();
 
-        assertThrows(NotFoundException.class, () -> accountController.update(randomId, updateDto),
+        when(jwtUtil.getUuid()).thenReturn(randomId.toString());
+        assertThrows(NotFoundException.class, () -> accountController.update(updateDto),
                 "Should throw NotFoundException for non-existent account id");
     }
 }
