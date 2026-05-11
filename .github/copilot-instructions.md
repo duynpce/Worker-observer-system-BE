@@ -19,21 +19,21 @@ Feature-based folder structure. Each feature follows this pattern:
     ├── /constant               # Enums and constants (e.g., AccountStatus.java, AccountType.java, CreditRank.java, Gender.java)
     ├── /controller             # REST controllers (e.g., AccountController.java, BusinessAccountController.java)
     ├── /dto                    # Data Transfer Objects
-    │   ├── CreateXxxRequest    # Request DTOs for create operations (abstract base + subclass per account type)
-    │   ├── UpdateXxxRequest    # Request DTOs for update operations
-    │   └── GetXxxResponse      # Response DTOs (abstract base + subclass per account type)
+    │   ├── CreateXxxDto   
+    │   ├── UpdateXxxDto   
+    │   └── GetXxxDto      
     ├── /entity                 # JPA entities (e.g., Account.java, PersonalAccount.java, BusinessAccount.java)
     ├── /mapper                 # MapStruct mappers (e.g., AccountMapper.java) — interface annotated with @Mapper
     ├── /repository             # Spring Data JPA repositories (e.g., AccountRepository.java)
     ├── /service
-    │   ├── /domain             # Write/command services (e.g., AccountService.java) — annotated with @Service, use @Transactional
+    │   ├── /domain             # Write/command services (e.g., AccountDomainService.java) — annotated with @Service, use @Transactional
     │   └── /query              # Read/query services (e.g., AccountQueryService.java) — use @Transactional(readOnly = true)
     └── /validator              # Business rule validators (e.g., AccountValidator.java) — annotated with @Component
 
 # patterns & conventions
 
     - Inheritance pattern: abstract base class (Account, CreateAccountRequest, GetAccountResponse) with concrete subclasses per type (Personal, Business, Government)
-    - DTOs are pure data classes using Lombok @Data; entities use @Data + @Entity + @NoArgsConstructor
+    - DTOs are pure data record
     - Mapper layer uses MapStruct (@Mapper(componentModel = "spring")), never map manually in service/controller
     - Services are split into domain (write) and query (read) if the service is too large; controllers depend on both
     - Validators are @Component classes injected into services; they throw exceptions on invalid input
@@ -213,58 +213,226 @@ Feature-based folder structure. Each feature follows this pattern:
 
 # test sample
 
+    test cases sample:
+    public class TransactionTestCases {
+
+	private static TransactionTestCases instance;
+
+	@Getter
+	private final Transaction transactionTestCase = new Transaction();
+
+	{
+		transactionTestCase.setId(1L);
+		transactionTestCase.setDescription("Transfer for testing");
+		transactionTestCase.setTransferredAmount(new BigDecimal("100.00"));
+		transactionTestCase.setType(TransactionType.TRANSFER);
+		transactionTestCase.setStatus(TransactionStatus.COMPLETED);
+		transactionTestCase.setCreatedAt(Instant.now());
+	}
+	public static TransactionTestCases getInstance() {
+		if (instance == null) {
+			instance = new TransactionTestCases();
+		}
+
+		return instance;
+	}
+
+
+	public CreateTransactionRequest getCreateTransferRequest(String receiverAccountNumber) {
+		return buildCreateRequest(receiverAccountNumber, TransactionType.TRANSFER);
+	}
+
+	public CreateTransactionRequest getCreatePaymentRequest(String receiverAccountNumber) {
+		return buildCreateRequest(receiverAccountNumber, TransactionType.PAYMENT);
+	}
+
+	public CreateTransactionRequest getCreateDepositRequest(String receiverAccountNumber) {
+		return buildCreateRequest(receiverAccountNumber, TransactionType.DEPOSIT);
+	}
+
+	public CreateTransactionRequest getCreateWithdrawalRequest(String receiverAccountNumber) {
+		return buildCreateRequest(receiverAccountNumber, TransactionType.WITHDRAWAL);
+	}
+
+	public CreateTransactionRequest getCreateInvalidReceiverRequest(String receiverAccountNumber, TransactionType type) {
+		return buildCreateRequest(receiverAccountNumber, type);
+	}
+
+	private CreateTransactionRequest buildCreateRequest(String receiverAccountNumber, TransactionType type) {
+		CreateTransactionRequest request = new CreateTransactionRequest();
+		request.setReceiverAccountNumber(receiverAccountNumber);
+		request.setDescription(type.name() + " for testing");
+		request.setTransferredAmount(new BigDecimal("100.00"));
+		request.setType(type);
+		return request;
+	}
+
+	public TransactionFilter getTransactionFilterTransactionGroupAll(){
+		return buildTransactionFilter(TransactionGroup.ALL);
+	}
+
+	public TransactionFilter getTransactionFilterTransactionGroupIncome(){
+		return buildTransactionFilter(TransactionGroup.INCOME);
+	}
+
+	public TransactionFilter getTransactionFilterTransactionGroupOutcome(){
+		return buildTransactionFilter(TransactionGroup.OUTCOME);
+	}
+
+	private TransactionFilter buildTransactionFilter(TransactionGroup transactionGroup){
+
+		TransactionFilter filter = new TransactionFilter();
+		PaginationDto paginationDto = new PaginationDto();
+		paginationDto.setPage(0);
+		paginationDto.setLimit(5);
+		filter.setPaginationDto(paginationDto);
+		filter.setTransactionGroup(transactionGroup);
+		filter.setTransactionGroup(transactionGroup);
+		return filter;
+	}
+
+	public TransactionReportFilter getYearTransactionReportFilter() {
+		TransactionReportFilter filter = new TransactionReportFilter();
+		filter.setReportType(TransactionReportType.YEAR);
+		filter.setYear(2026);
+		return filter;
+	}
+
+	public TransactionReportFilter getInvalidYearTransactionReportFilter() {
+		TransactionReportFilter filter = new TransactionReportFilter();
+		filter.setReportType(TransactionReportType.YEAR);
+		return filter;
+	}
+
+}
+
     unit test sample (service):
-      @Test
-      public void createCardPrivilegeCodeSuccess() {
-          // arrange valid request + mapper + validator + query save mocks
-          // act service.create(request)
-          // assert saved entity returned and dependencies invoked
-      }
+    @Test
+	public void createPaymentTransactionSuccess() {
+		Account sender = accountTestCases.getPersonalAccountTestCase().getAccount();
+		Account receiver = accountTestCases.getBusinessAccountTestCase().getAccount();
+		CreateTransactionRequest request = transactionTestCases.getCreatePaymentRequest(receiver.getNumber());
 
-      @Test
-      public void createCardPrivilegeCodeFailureValidationError() {
-          // arrange validator throws ValidationException
-          // act/assert service.create(request) throws ValidationException
-          // verify save is never called
-      }
+		Transaction transaction = new Transaction();
+		transaction.setType(TransactionType.PAYMENT);
+		transaction.setTransferredAmount(request.getTransferredAmount());
+		transaction.setReceiver(receiver);
 
-      @Test
-      public void updateCardPrivilegeCodeSuccess() {
-          // arrange active entity lookup + validator update + save mocks
-          // act service.update(request)
-          // assert updated entity returned and dependencies invoked
-      }
+		Jwt jwt = mock(Jwt.class);
+		when(jwtUtil.getJwtClaims()).thenReturn(jwt);
+		when(jwt.getClaim("account_id")).thenReturn(sender.getId());
+		when(transactionMapper.toEntity(request)).thenReturn(transaction);
+		when(accountQueryService.findById(sender.getId())).thenReturn(sender);
+		when(accountQueryService.findByAccountNumber(receiver.getNumber())).thenReturn(receiver);
+		when(transactionRepository.save(transaction)).thenReturn(transaction);
 
-      @Test
-      public void updateCardPrivilegeCodeFailureValidationError() {
-          // arrange validator throws ValidationException
-          // act/assert service.update(request) throws ValidationException
-          // verify save is never called
-      }
+		Transaction result = transactionService.create(request);
+
+		assertEquals(TransactionStatus.PENDING, result.getStatus());
+		assertEquals(sender, result.getSender());
+		assertEquals(receiver, result.getReceiver());
+		verify(transactionValidator).validateCreate(request, sender);
+		verify(transactionRepository).save(transaction);
+	}
+   
 
     integration test sample (controller):
-      @Test
-      public void testCreateCardPrivilegeCodeSuccess() {
-          // arrange valid request DTO
-          // act controller.create(request)
-          // assert ResponseDto success and data persisted
-      }
+     @Test
+	public void createTransactionSuccess() {
+		TransferScenario transferScenario = setupTransferScenario();
+		CreateTransactionRequest request = transferScenario.request();
+		ResponseEntity<ResponseDto<String>> response = transactionController.create(request);
 
-      @Test
-      public void testCreateCardPrivilegeCodeFailValidation() {
-          // arrange invalid payload (e.g. effectiveTo <= effectiveFrom)
-          // act/assert controller.create(request) throws ValidationException
-      }
+		assertEquals(HttpStatus.OK, response.getStatusCode(), "Response status should be OK");
+		assertNotNull(response.getBody(), "Response body should not be null");
+		assertTrue(response.getBody().isSuccess(), "Response success flag should be true");
+		assertEquals("Transaction created successfully", response.getBody().getMessage(), "Success message should match");
 
-      @Test
-      public void testUpdateCardPrivilegeCodeSuccess() {
-          // arrange existing code via create then call update
-          // assert ResponseDto success and persisted values changed
-      }
+		//because in transaction not commited yet , so this object updated by hibernate (it's like query updated object)
+		assertEquals(transferScenario.receiver().getBalance(), transferScenario.initialBalance().add(request.getTransferredAmount()), "Receiver balance should be increased by transferred amount");
+		assertEquals(transferScenario.sender().getBalance(), transferScenario.initialBalance().subtract(request.getTransferredAmount()), "Sender balance should be decreased by transferred amount");
 
-      @Test
-      public void testUpdateCardPrivilegeCodeFailValidation() {
-          // arrange update request with no updatable fields
-          // act/assert controller.update(request) throws ValidationException
-      }
+	}
 
+    // a shared setup
+    private TransferScenario setupTransferScenario() {
+    CreatePersonalAccountRequest createPersonalAccountRequest = accountTestCases.getCreatePersonalAccountRequestTestCase();
+    CreateBusinessAccountRequest createBusinessAccountRequest = accountTestCases.getCreateBusinessAccountRequestTestCase();
+
+		personalAccountController.create(createPersonalAccountRequest);
+		businessAccountController.create(createBusinessAccountRequest);
+
+		Account sender = accountQueryService.findByUsername(createBusinessAccountRequest.getUsername());
+		Account receiver = accountQueryService.findByUsername(createPersonalAccountRequest.getUsername());
+
+		BigDecimal initialBalance = new BigDecimal("500.00");
+		sender.setBalance(initialBalance);
+		receiver.setBalance(initialBalance);
+
+		accountQueryService.save(receiver);
+		accountQueryService.save(sender);
+
+		Jwt jwt = new Jwt(
+				"test-token",
+				Instant.now(),
+				Instant.now().plusSeconds(3600),
+				Map.of("alg", "none"),
+				Map.of(
+						"account_id", sender.getId(),
+						"account_number", sender.getNumber()
+				)
+		);
+		when(jwtUtil.getJwtClaims()).thenReturn(jwt);
+
+		CreateTransactionRequest request = transactionTestCases.getCreateTransferRequest(receiver.getNumber());
+		return new TransferScenario(sender, receiver, initialBalance, request);
+	}
+
+	private record TransferScenario(
+			Account sender,
+			Account receiver,
+			BigDecimal initialBalance,
+			CreateTransactionRequest request
+	) {
+	}
+
+    private TransferScenario setupTransferScenario() {
+		CreatePersonalAccountRequest createPersonalAccountRequest = accountTestCases.getCreatePersonalAccountRequestTestCase();
+		CreateBusinessAccountRequest createBusinessAccountRequest = accountTestCases.getCreateBusinessAccountRequestTestCase();
+
+		personalAccountController.create(createPersonalAccountRequest);
+		businessAccountController.create(createBusinessAccountRequest);
+
+		Account sender = accountQueryService.findByUsername(createBusinessAccountRequest.getUsername());
+		Account receiver = accountQueryService.findByUsername(createPersonalAccountRequest.getUsername());
+
+		BigDecimal initialBalance = new BigDecimal("500.00");
+		sender.setBalance(initialBalance);
+		receiver.setBalance(initialBalance);
+
+		accountQueryService.save(receiver);
+		accountQueryService.save(sender);
+
+		Jwt jwt = new Jwt(
+				"test-token",
+				Instant.now(),
+				Instant.now().plusSeconds(3600),
+				Map.of("alg", "none"),
+				Map.of(
+						"account_id", sender.getId(),
+						"account_number", sender.getNumber()
+				)
+		);
+		when(jwtUtil.getJwtClaims()).thenReturn(jwt);
+
+		CreateTransactionRequest request = transactionTestCases.getCreateTransferRequest(receiver.getNumber());
+		return new TransferScenario(sender, receiver, initialBalance, request);
+	}
+
+	private record TransferScenario(
+			Account sender,
+			Account receiver,
+			BigDecimal initialBalance,
+			CreateTransactionRequest request
+	) {
+	}
