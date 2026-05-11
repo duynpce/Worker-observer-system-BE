@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -27,6 +28,11 @@ public class AccountQueryService {
         return accountRepository.findByEmail(email).orElseThrow(
                 () -> new NotFoundException("Account not found with email: " + email)
         );
+    }
+
+    @Transactional(readOnly = true)
+    public List<Account> findAll() {
+        return accountRepository.findAll();
     }
 
     @Transactional
