@@ -1,4 +1,4 @@
-package com.example.worker_observer_system.common.config;
+package com.example.worker_observer_system.config.security;
 
 import com.example.worker_observer_system.common.exception.NotFoundException;
 import com.example.worker_observer_system.domain.account.Account;

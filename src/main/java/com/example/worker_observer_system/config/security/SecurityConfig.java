@@ -1,4 +1,4 @@
-package com.example.worker_observer_system.common.config;
+package com.example.worker_observer_system.config.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,8 +23,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         //public endpoints
-                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/login", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                         .requestMatchers(HttpMethod.POST, "/v1/accounts").permitAll()
+
                         //authenticated endpoints
                         .anyRequest().authenticated()
                 )

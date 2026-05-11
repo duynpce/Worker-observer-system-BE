@@ -26,10 +26,9 @@ public class AccountController {
 
     @PutMapping("/{id}")
     public ResponseEntity<ResponseDto<String>> update(
-            @PathVariable UUID id,
             @Valid @RequestBody UpdateAccountDto dto
     ) {
-        accountDomainService.update(id, dto);
+        accountDomainService.update(dto);
         return ResponseEntity.ok(ResponseDto.success(null, "Account updated successfully"));
     }
 }

@@ -1,5 +1,6 @@
 package com.example.worker_observer_system.domain.account.Service;
 
+import com.example.worker_observer_system.common.util.JwtUtil;
 import com.example.worker_observer_system.domain.account.Account;
 import com.example.worker_observer_system.domain.account.AccountMapper;
 import com.example.worker_observer_system.domain.account.AccountValidator;
@@ -21,6 +22,7 @@ public class AccountDomainService {
     private final AccountQueryService accountQueryService;
     private final AccountValidator accountValidator;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     @Transactional
     public Account create(CreateAccountDto dto) {
@@ -32,7 +34,8 @@ public class AccountDomainService {
     }
 
     @Transactional
-    public Account update(UUID id, UpdateAccountDto dto) {
+    public Account update( UpdateAccountDto dto) {
+        UUID id = UUID.fromString(jwtUtil.getUuid());
         Account existingAccount = accountQueryService.findById(id);
         accountValidator.validateUpdate(dto, existingAccount);
         if (dto.password() != null) {
