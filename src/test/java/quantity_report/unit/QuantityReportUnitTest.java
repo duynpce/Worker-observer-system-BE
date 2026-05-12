@@ -141,7 +141,7 @@ public class QuantityReportUnitTest extends UnitTest {
         assertNotNull(response);
         assertTrue(response.isSuccess());
         assertEquals(1, response.getData().size(), "Absent account should be included");
-        assertEquals(response.getData().getFirst().getQuantity(),0, "Absent account quantity should be null");
+        assertEquals(0, response.getData().getFirst().getQuantity(), "Absent account quantity should be null");
         assertEquals(account.getId(), response.getData().getFirst().getAccountId());
     }
 }

@@ -30,6 +30,8 @@ public class CustomUserDetailsService implements UserDetailsService {
                     .build();
         }catch(NotFoundException e){
             throw new UsernameNotFoundException(e.getMessage());
+        }catch (IllegalArgumentException e){
+            throw new UsernameNotFoundException("Authentication failed, invalid QR code");
         }
     }
 }
