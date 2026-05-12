@@ -15,12 +15,13 @@ import java.util.List;
 public class DailyAttendanceController {
     private final DailyAttendanceDomainService dailyAttendanceDomainService;
 
-    @PostMapping("/check_attendance")
+    @PostMapping("/check-attendance")
     public ResponseEntity<ResponseDto<Void>> checkAttendance(
             @RequestParam AttendanceType attendanceType
     ) {
         dailyAttendanceDomainService.checkAttendance(attendanceType);
-        return ResponseEntity.ok(ResponseDto.success(null, "Attendance checked successfully"));
+        String message = attendanceType == AttendanceType.START_TIME ? "Check-in successful" : "Check-out successful";
+        return ResponseEntity.ok(ResponseDto.success(null, message));
     }
 
     @GetMapping

@@ -22,7 +22,7 @@ public class QuantityReportController {
     @PostMapping
     public ResponseEntity<ResponseDto<Void>> create(@Valid @RequestBody CreateQuantityReportDto dto) {
         quantityReportDomainService.create(dto);
-        return ResponseEntity.ok(ResponseDto.success(null, "Quantity report created successfully"));
+        return ResponseEntity.ok(ResponseDto.success(null, "Quantity reported successfully"));
     }
 
     @GetMapping
