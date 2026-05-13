@@ -45,4 +45,43 @@ Demo:
 
     - using QR to track the flow of items through the stations
         - Link : https://www.youtube.com/watch?v=ARuQLcPc5gI
+
+project's details:
+    
+    - Workflow : 
+        - backend :
+           - client --> controller --> service -> validation --> repository --> database
+        - frontend :
+            - big component --> subcomponent --> component's hooks(hook for state and effects, only for its component) 
+                --> domain hooks(hooks for business logic, used in multiple components) --> service(API calls) 
+    
+    - Techstack :
+        - backend : Spring Boot.
+        - frontend : React .
+        - database : PostgreSQL.
+
+how to run the project :
+
+    required environment :
+        Runtime/Language: ( Node.js 24 and  Java 21)
+        Database: (PostgreSQL 18 )
+        Package Manager: (npm and Maven)
+        spring boot version : 3.5.14
+        react version : 19.2.14 with vite 8.0.10
+
+    after cloning the project, you can run the backend and frontend separately by following the instructions below:
+    
+    - backend :
+        - navigate to the backend directory and run the following command to start the Spring Boot application:
+            - on linux/mac : `./mvnw spring-boot:run` (not quite sure, because I have only tested it on windows)
+            - on windows : `./mvnw.cmd spring-boot:run`
+    - frontend :
+        - navigate to the frontend directory and run the following command to start the React application:
+            - `npm install` to install the dependencies
+            - `npm run dev` to start the development server
+
+    QR code for account: format : "${worker 's UUID} ${password}"
+    QR code for item: format : "${item's UUID}"
+
+    
     
