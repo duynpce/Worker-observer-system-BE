@@ -60,7 +60,7 @@ public class DailyAttendanceIntegrationTest extends IntegrationTest {
         assertEquals(HttpStatus.OK, response.getStatusCode(), "Response status should be OK");
         assertNotNull(response.getBody(), "Response body should not be null");
         assertTrue(response.getBody().isSuccess(), "Response success flag should be true");
-        assertEquals("Attendance checked successfully", response.getBody().getMessage(), "Success message should match");
+        assertEquals("Check-in successful", response.getBody().getMessage(), "Success message should match");
     }
 
     @Test

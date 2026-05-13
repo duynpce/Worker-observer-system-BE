@@ -94,7 +94,7 @@ public class DailyAttendanceUnitTest extends UnitTest {
         when(jwtUtil.getUuid()).thenReturn(account.getId().toString());
         when(accountQueryService.findById(account.getId())).thenReturn(account);
         when(attendancePolicyQueryService.findActivePolicyForDate(any(LocalDate.class))).thenReturn(policy);
-        when(dailyAttendanceQueryService.findByAccountIdAndDateAndType(any(UUID.class), any(LocalDate.class), eq(AttendanceType.START_TIME))).thenReturn(Optional.empty());
+        when(dailyAttendanceQueryService.findByAccountIdAndDateAndType(any(UUID.class), any(LocalDate.class), eq(AttendanceType.END_TIME))).thenReturn(Optional.empty());
         when(dailyAttendanceQueryService.save(any(DailyAttendance.class))).thenAnswer(inv -> inv.getArgument(0));
 
         DailyAttendance result = dailyAttendanceDomainService.checkAttendance(AttendanceType.END_TIME);

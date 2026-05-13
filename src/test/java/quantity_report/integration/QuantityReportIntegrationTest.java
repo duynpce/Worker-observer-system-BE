@@ -51,7 +51,7 @@ public class QuantityReportIntegrationTest extends IntegrationTest {
         assertEquals(HttpStatus.OK, response.getStatusCode(), "Response status should be OK");
         assertNotNull(response.getBody(), "Response body should not be null");
         assertTrue(response.getBody().isSuccess(), "Response success flag should be true");
-        assertEquals("Quantity report created successfully", response.getBody().getMessage(), "Success message should match");
+        assertEquals("Quantity reported successfully", response.getBody().getMessage(), "Success message should match");
     }
 
     @Test
@@ -66,7 +66,7 @@ public class QuantityReportIntegrationTest extends IntegrationTest {
         assertEquals(HttpStatus.OK, response.getStatusCode(), "Response status should be OK");
         assertNotNull(response.getBody(), "Response body should not be null");
         assertTrue(response.getBody().isSuccess(), "Response success flag should be true");
-        assertEquals("Quantity report created successfully", response.getBody().getMessage(), "Success message should match");
+        assertEquals("Quantity reported successfully", response.getBody().getMessage(), "Success message should match");
     }
 
     @Test
