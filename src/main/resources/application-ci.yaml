@@ -17,4 +17,7 @@ server:
   servlet:
     context-path: /api
 
+properties:
+  client-origin-uri: "http://localhost:5173"
+
 

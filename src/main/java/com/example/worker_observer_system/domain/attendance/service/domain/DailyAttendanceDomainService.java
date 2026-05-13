@@ -79,18 +79,19 @@ public class DailyAttendanceDomainService {
 
     private DailyAttendance resolveEndTimeAttendance(LocalDateTime now, AttendancePolicy policy, Account account) {
         Optional<DailyAttendance> existingDailyAttendance = dailyAttendanceQueryService.findByAccountIdAndDateAndType(
-                account.getId(), now.toLocalDate(), AttendanceType.START_TIME
+                account.getId(), now.toLocalDate(), AttendanceType.END_TIME
         );
 
         DailyAttendance dailyAttendance = existingDailyAttendance.orElseGet(DailyAttendance::new);
+
         dailyAttendance.setType(AttendanceType.END_TIME);
         dailyAttendance.setAttendanceDate(now.toLocalDate());
         dailyAttendance.setAttendanceTime(now.toLocalTime());
         dailyAttendance.setAccount(account);
 
-        if(policy.getEndTime().isBefore(now.toLocalTime())){
+        if (policy.getEndTime().isBefore(now.toLocalTime())) {
             dailyAttendance.setStatus(AttendanceStatus.ON_TIME_LEAVE);
-        }else{
+        } else {
             dailyAttendance.setStatus(AttendanceStatus.EARLY_LEAVE);
         }
 
