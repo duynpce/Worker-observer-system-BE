@@ -1,4 +1,10 @@
 # worker-observer-sysem-be
+introduction :
+    
+    - this project was created for a technical challenge, done by only one person
+    - with limited time and resources : only in 4.5 days (night of 9th to morning of 14th may 2026) 
+    - the goal was to design and implement a system to manage the floor of an industrial laundry in real time
+
 context :
 
     - a company with a 30-worker industrial laundry processing 2 tonnes of hotel linen per day across 6 stations : receiving, sorting, washing, drying, ironing/folding, packing/dispatch 
@@ -17,15 +23,26 @@ Problem :
     - When something goes wrong — a batch is late, an item is damaged, a station is bottlenecked, a worker is absent and nobody notices 
     the manager finds out hours after the fact. By then the damage is already downstream.
     - The owner or operations director above the manager has it worse. They get a weekly summary, often hand-typed into Excel from paper ledgers, often with errors, often a week late
+    - floor manager has no real-time data of which station a item is at
 
 Solution :
     
-    - a observer system to manage the floor in real time, to track the flow of items through the stations using QR codes, to identify bottlenecks and issues as they happen, and to provide accurate data for reporting and decision making.
-
+    - a observer system to manage the floor in real time  using QR codes:
+        - to track the flow of items through the stations
+        - to track the attendance and performance of workers
+        - to provide real-time data and insights to the floor manager and owner for better decision making and problem-solving.
+        - to report any issues or bottlenecks in the process and alert the manager in real time(updating)
 Features : 
     
-    QR code tracking : each worker will has a unique QR code on their card, and they can use their card to check attendance (prevent unrecorded absences) and delare the numbers of Items they have processed.
-    floor manager : also use QR codes ,a dashboard to show the floor data, a notification system to alert the manager of any issues, and a reporting system to provide accurate data for decision making.
+    - each worker will has a unique QR code on their card, and they can use their card to check attendance (prevent unrecorded absences) and delare the numbers of Items they have processed.
+    - floor manager also use QR codes ,a dashboard to show the floor data, a notification system(updating) to alert the manager of any issues, and a reporting system to provide accurate data for decision making.
+    - items are tracked through the stations using QR codes, allowing the manager to see in real time where each item is in the process and identify any bottlenecks or issues.
 
+Demo:
 
+    - using QR to check attendance and declare the numbers of items processed by workers
+        - Link : https://www.youtube.com/watch?v=-x0VS_4JW4w
+
+    - using QR to track the flow of items through the stations
+        - Link : https://www.youtube.com/watch?v=ARuQLcPc5gI
     
